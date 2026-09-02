@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SmartHome Pulse — IoT Automation & Energy Simulation</title>
+    <meta name="description" content="Next-generation IoT smart home simulator with real-time multi-room device telemetry, automated scene presets, RGB mood lighting, and energy monitoring." />
+    <link rel="stylesheet" href="/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app-container">
+      
+      <!-- Top Telemetry & Weather Header -->
+      <header class="hub-header glass-panel">
+        <div class="header-left">
+          <div class="brand-badge-box">
+            <span class="brand-icon">🏠</span>
+            <div class="brand-details">
+              <div class="brand-title-row">
+                <span class="brand-name">SmartHome Pulse</span>
+                <span class="online-pill">● SYSTEM ONLINE</span>
+              </div>
+              <p id="system-quick-status" class="brand-subtext">Calculating real-time telemetry...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Summary Cards -->
+        <div class="header-telemetry">
+          <div class="telemetry-card">
+            <span class="tel-label">Active Devices</span>
+            <span id="tel-active-devices" class="tel-value">0 / 0</span>
+          </div>
+          <div class="telemetry-card">
+            <span class="tel-label">Power Load</span>
+            <span id="tel-power-draw" class="tel-value text-cyan">0 W</span>
+          </div>
+          <div class="telemetry-card">
+            <span class="tel-label">Solar Output</span>
+            <span id="tel-solar-output" class="tel-value text-emerald">+4.8 kW</span>
+          </div>
+          <div class="telemetry-card weather-card">
+            <div class="weather-icon">☀️</div>
+            <div class="weather-info">
+              <span id="weather-temp" class="weather-temp">74°F</span>
+              <span class="weather-desc">Clear & Sunny</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- 1-Click Automation Scenes Bar -->
+      <section class="scenes-section glass-panel">
+        <div class="section-tag">
+          <span>⚡ QUICK AUTOMATION SCENES</span>
+        </div>
+        <div class="scenes-grid">
+          <button class="scene-btn" data-scene="morning" id="scene-morning">
+            <span class="scene-icon">🌅</span>
+            <div class="scene-text">
+              <strong>Good Morning</strong>
+              <small>Blinds 100%, 72°F, Espresso on</small>
+            </div>
+          </button>
+          <button class="scene-btn" data-scene="movie" id="scene-movie">
+            <span class="scene-icon">🎬</span>
+            <div class="scene-text">
+              <strong>Movie Night</strong>
+              <small>Dim violet lights, Soundbar on</small>
+            </div>
+          </button>
+          <button class="scene-btn" data-scene="night" id="scene-night">
+            <span class="scene-icon">🌙</span>
+            <div class="scene-text">
+              <strong>Good Night</strong>
+              <small>All lights off, Lock garage, 68°F</small>
+            </div>
+          </button>
+          <button class="scene-btn" data-scene="away" id="scene-away">
+            <span class="scene-icon">🛡️</span>
+            <div class="scene-text">
+              <strong>Away / Armed</strong>
+              <small>CCTV active, Standby eco mode</small>
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Main Hub Body -->
+      <main class="hub-main">
+        
+        <!-- Room Selector Tabs Bar & Action Row -->
+        <div class="room-nav-bar">
+          <div class="room-tabs" id="room-tabs">
+            <button class="room-tab active" data-room="living">
+              <span class="tab-icon">🛋️</span> Living Room
+            </button>
+            <button class="room-tab" data-room="bedroom">
+              <span class="tab-icon">🛏️</span> Bedroom
+            </button>
+            <button class="room-tab" data-room="kitchen">
+              <span class="tab-icon">🍳</span> Kitchen
+            </button>
+            <button class="room-tab" data-room="garage">
+              <span class="tab-icon">🚗</span> Garage & Solar
+            </button>
+            <button class="room-tab" data-room="all">
+              <span class="tab-icon">🌐</span> All Devices
+            </button>
+          </div>
+
+          <div class="room-actions">
+            <button id="btn-toggle-all-room" class="btn btn-secondary btn-sm" title="Toggle all devices in current room">
+              <span class="btn-icon">⚡</span> Toggle Room
+            </button>
+            <button id="btn-add-device-modal" class="btn btn-primary btn-sm" title="Add custom IoT smart device">
+              <span class="btn-icon">＋</span> Add Device
+            </button>
+          </div>
+        </div>
+
+        <!-- Devices Grid -->
+        <div class="devices-grid" id="devices-container">
+          <!-- Dynamically populated room device cards -->
+        </div>
+
+      </main>
+
+      <!-- Bottom Audio Visualizer & System Status -->
+      <footer class="hub-footer glass-panel">
+        <div class="footer-left">
+          <span class="soundbar-status-icon">🎵</span>
+          <div class="soundbar-info">
+            <span id="footer-now-playing">Spatial Audio Soundbar • Offline</span>
+            <div class="audio-equalizer" id="footer-equalizer">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-right">
+          <button id="btn-reset-demo" class="btn-link" title="Reset to default smart home setup">
+            🔄 Reset Devices
+          </button>
+          <span class="footer-sep">|</span>
+          <span>IoT WebSocket Mock Protocol v2.4</span>
+        </div>
+      </footer>
+
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- MODAL: ADD CUSTOM IOT DEVICE                             -->
+    <!-- ======================================================== -->
+    <div id="add-device-modal" class="modal-overlay hidden">
+      <div class="modal-card glass-panel">
+        <div class="modal-header">
+          <h3>Add Smart Device</h3>
+          <button id="btn-close-device-modal" class="btn-modal-close">✕</button>
+        </div>
+        <form id="add-device-form">
+          <div class="form-group">
+            <label for="dev-name">Device Name</label>
+            <input type="text" id="dev-name" placeholder="e.g. Desk Lamp, Humidifier..." required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dev-room">Assigned Room</label>
+              <select id="dev-room" required>
+                <option value="living">🛋️ Living Room</option>
+                <option value="bedroom">🛏️ Bedroom</option>
+                <option value="kitchen">🍳 Kitchen</option>
+                <option value="garage">🚗 Garage</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="dev-type">Device Type</label>
+              <select id="dev-type" required>
+                <option value="light">💡 Smart Light / Lamp</option>
+                <option value="appliance">🔌 Smart Plug / Appliance</option>
+                <option value="climate">❄️ Fan / Climate</option>
+                <option value="security">📷 Sensor / Camera</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="dev-power">Power Rating (Watts)</label>
+            <input type="number" id="dev-power" value="45" min="1" max="3000" required />
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" id="btn-cancel-device-modal" class="btn btn-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Add Smart Device</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
