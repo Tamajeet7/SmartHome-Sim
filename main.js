@@ -1,161 +1,161 @@
-// --- SmartHome-Sim IoT State & Device Registry ---
+// --- CozyHome Smart IoT State & Device Registry ---
 
 const DEFAULT_DEVICES = [
-  // Living Room
+  // Cozy Living
   {
     id: 'living-light',
     room: 'living',
-    name: 'Smart RGB Chandelier',
+    name: 'Warm Ambient Chandelier',
     type: 'light',
     power: true,
-    brightness: 85,
-    color: '#38bdf8',
-    watts: 60,
+    brightness: 80,
+    color: '#ff8c7a',
+    watts: 45,
     custom: false
   },
   {
     id: 'living-ac',
     room: 'living',
-    name: 'Dual-Zone Climate HVAC',
+    name: 'Cozy Fireplace & Climate',
     type: 'climate',
     power: true,
     targetTemp: 72,
-    mode: 'Cool',
-    watts: 750,
+    mode: 'Warm Cozy',
+    watts: 450,
     custom: false
   },
   {
     id: 'living-cctv',
     room: 'living',
-    name: 'Front Entry 4K Camera',
+    name: 'Garden & Porch Cam',
     type: 'cctv',
     power: true,
-    motion: true,
-    watts: 15,
+    motion: false,
+    watts: 12,
     custom: false
   },
   {
     id: 'living-soundbar',
     room: 'living',
-    name: 'Spatial Soundbar Pro',
+    name: 'Cozy Living Speaker',
     type: 'soundbar',
-    power: false,
-    track: 'Lofi Chill Beats',
-    volume: 65,
-    watts: 45,
+    power: true,
+    track: 'Lofi Study Beats ☕',
+    volume: 60,
+    watts: 30,
     custom: false
   },
 
-  // Bedroom
+  // Comfy Bedroom
   {
     id: 'bedroom-light',
     room: 'bedroom',
-    name: 'Circadian Bedside Lamp',
+    name: 'Candlelight Bedside Lamp',
     type: 'light',
     power: true,
-    brightness: 40,
-    color: '#fbbf24',
-    watts: 20,
+    brightness: 35,
+    color: '#fbb03b',
+    watts: 15,
     custom: false
   },
   {
     id: 'bedroom-blinds',
     room: 'bedroom',
-    name: 'Motorized Smart Blinds',
+    name: 'Sunlight Motorized Blinds',
     type: 'blinds',
     power: true,
-    position: 80,
-    watts: 15,
+    position: 85,
+    watts: 10,
     custom: false
   },
   {
     id: 'bedroom-purifier',
     room: 'bedroom',
-    name: 'Air Purifier HEPA Pro',
+    name: 'Quiet Breeze Air Purifier',
     type: 'purifier',
     power: true,
-    aqi: 14,
-    speed: 'Auto Eco',
-    watts: 35,
+    aqi: 12,
+    speed: 'Whisper Quiet',
+    watts: 20,
     custom: false
   },
   {
     id: 'bedroom-noise',
     room: 'bedroom',
-    name: 'Sleep Sound Generator',
+    name: 'Sleepy Rain Generator',
     type: 'appliance',
     power: false,
-    watts: 10,
+    watts: 8,
     custom: false
   },
 
-  // Kitchen
+  // Warm Kitchen
   {
     id: 'kitchen-espresso',
     room: 'kitchen',
-    name: 'Smart Espresso Machine',
+    name: 'Artisan Espresso Machine',
     type: 'espresso',
     power: false,
     isBrewing: false,
     brewSeconds: 0,
-    watts: 1250,
+    watts: 950,
     custom: false
   },
   {
     id: 'kitchen-fridge',
     room: 'kitchen',
-    name: 'Smart French Door Fridge',
+    name: 'Cozy Pantry Refrigerator',
     type: 'fridge',
     power: true,
     fridgeTemp: 37,
     freezerTemp: 0,
     doorOpen: false,
-    watts: 160,
+    watts: 140,
     custom: false
   },
   {
     id: 'kitchen-light',
     room: 'kitchen',
-    name: 'Under-Cabinet LED Strip',
+    name: 'Warm Counter Fairy Lights',
     type: 'light',
     power: true,
     brightness: 90,
-    color: '#f59e0b',
-    watts: 30,
+    color: '#fbb03b',
+    watts: 25,
     custom: false
   },
 
-  // Garage & Solar
+  // Garden & Garage
   {
     id: 'garage-door',
     room: 'garage',
-    name: 'Roll-Up Smart Garage Door',
+    name: 'Cottage Garage & Gate',
     type: 'garage-door',
     power: false, // Closed
     state: 'Closed',
-    watts: 120,
+    watts: 100,
     custom: false
   },
   {
     id: 'garage-ev',
     room: 'garage',
-    name: 'Tesla Wall Connector EV',
+    name: 'Electric Car Home Charger',
     type: 'ev-charger',
     power: true,
-    batteryPct: 84,
-    chargeKw: 11.5,
-    watts: 2400,
+    batteryPct: 88,
+    chargeKw: 9.6,
+    watts: 1800,
     custom: false
   },
   {
     id: 'garage-flood',
     room: 'garage',
-    name: 'Motion Floodlights',
+    name: 'Garden Path Lights',
     type: 'light',
     power: false,
     brightness: 100,
-    color: '#ffffff',
-    watts: 90,
+    color: '#ff8c7a',
+    watts: 60,
     custom: false
   }
 ];
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Storage Management ---
 function loadDevices() {
   try {
-    const saved = localStorage.getItem('smarthome_devices_v2');
+    const saved = localStorage.getItem('cozyhome_devices_v3');
     if (saved) {
       devices = JSON.parse(saved);
     } else {
@@ -213,7 +213,7 @@ function loadDevices() {
 
 function saveDevices() {
   try {
-    localStorage.setItem('smarthome_devices_v2', JSON.stringify(devices));
+    localStorage.setItem('cozyhome_devices_v3', JSON.stringify(devices));
   } catch (err) {
     console.error('Error saving devices:', err);
   }
@@ -241,27 +241,27 @@ function updateTelemetry() {
   elTelPowerDraw.textContent = `${totalWatts.toLocaleString()} W`;
 
   const roomNameMap = {
-    living: 'Living Room',
-    bedroom: 'Bedroom',
-    kitchen: 'Kitchen',
-    garage: 'Garage & Solar',
-    all: 'Whole House'
+    living: 'Cozy Living',
+    bedroom: 'Comfy Bedroom',
+    kitchen: 'Warm Kitchen',
+    garage: 'Garden & Garage',
+    all: 'Whole Sanctuary'
   };
 
-  const currentRoomName = roomNameMap[currentRoom] || 'Living Room';
+  const currentRoomName = roomNameMap[currentRoom] || 'Cozy Living';
   const roomActive = devices.filter(d => (currentRoom === 'all' || d.room === currentRoom) && d.power).length;
 
-  elQuickStatus.textContent = `${currentRoomName}: ${roomActive} active IoT nodes • Grid load optimal`;
+  elQuickStatus.textContent = `${currentRoomName}: ${roomActive} active accessories • Everything warm & safe 🪴`;
 }
 
 // --- Footer Soundbar Visualizer ---
 function updateFooterAudio() {
   const soundbar = devices.find(d => d.type === 'soundbar');
   if (soundbar && soundbar.power) {
-    elFooterPlaying.textContent = `Spatial Soundbar • Playing: "${soundbar.track}" (${soundbar.volume}%)`;
+    elFooterPlaying.textContent = `Cozy Speaker • Playing: "${soundbar.track}" (${soundbar.volume}%)`;
     elFooterEqualizer.classList.add('playing');
   } else {
-    elFooterPlaying.textContent = 'Spatial Audio Soundbar • Standby';
+    elFooterPlaying.textContent = 'Living Room Speaker • Resting in standby 💤';
     elFooterEqualizer.classList.remove('playing');
   }
 }
@@ -276,9 +276,9 @@ function renderDevicesGrid() {
   if (filtered.length === 0) {
     elDevicesContainer.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-dim);">
-        <p style="font-size: 2rem; margin-bottom: 0.5rem;">🔌</p>
-        <h3>No devices in this room</h3>
-        <p style="font-size: 0.85rem; margin-top: 4px;">Click <strong>＋ Add Device</strong> to add smart accessories.</p>
+        <p style="font-size: 2.2rem; margin-bottom: 0.5rem;">🪴</p>
+        <h3>No devices in this cozy corner yet</h3>
+        <p style="font-size: 0.85rem; margin-top: 4px;">Click <strong>＋ Add Device</strong> to add warm accessories.</p>
       </div>
     `;
     return;
@@ -300,16 +300,16 @@ function generateDeviceCardHTML(dev) {
     controlHTML = `
       <div class="slider-control-box">
         <div class="slider-label-row">
-          <span>Brightness</span>
+          <span>Warmth & Glow</span>
           <span class="brightness-val">${dev.power ? dev.brightness : 0}%</span>
         </div>
         <input type="range" min="1" max="100" value="${dev.brightness}" class="dev-range-slider light-slider" data-id="${dev.id}" ${!dev.power ? 'disabled' : ''}>
         <div class="rgb-palette-row">
-          <button class="color-dot-btn ${dev.color === '#ffffff' ? 'active' : ''}" style="background-color: #ffffff;" data-id="${dev.id}" data-color="#ffffff" title="Daylight White"></button>
-          <button class="color-dot-btn ${dev.color === '#38bdf8' ? 'active' : ''}" style="background-color: #38bdf8;" data-id="${dev.id}" data-color="#38bdf8" title="Ice Blue"></button>
-          <button class="color-dot-btn ${dev.color === '#fbbf24' ? 'active' : ''}" style="background-color: #fbbf24;" data-id="${dev.id}" data-color="#fbbf24" title="Warm Amber"></button>
-          <button class="color-dot-btn ${dev.color === '#a855f7' ? 'active' : ''}" style="background-color: #a855f7;" data-id="${dev.id}" data-color="#a855f7" title="Cyber Violet"></button>
-          <button class="color-dot-btn ${dev.color === '#10b981' ? 'active' : ''}" style="background-color: #10b981;" data-id="${dev.id}" data-color="#10b981" title="Emerald Glow"></button>
+          <button class="color-dot-btn ${dev.color === '#ff8c7a' ? 'active' : ''}" style="background-color: #ff8c7a;" data-id="${dev.id}" data-color="#ff8c7a" title="Peach Sunset"></button>
+          <button class="color-dot-btn ${dev.color === '#fbb03b' ? 'active' : ''}" style="background-color: #fbb03b;" data-id="${dev.id}" data-color="#fbb03b" title="Warm Candlelight"></button>
+          <button class="color-dot-btn ${dev.color === '#86efac' ? 'active' : ''}" style="background-color: #86efac;" data-id="${dev.id}" data-color="#86efac" title="Cozy Matcha"></button>
+          <button class="color-dot-btn ${dev.color === '#d8b4fe' ? 'active' : ''}" style="background-color: #d8b4fe;" data-id="${dev.id}" data-color="#d8b4fe" title="Soft Lavender"></button>
+          <button class="color-dot-btn ${dev.color === '#ffffff' ? 'active' : ''}" style="background-color: #ffffff;" data-id="${dev.id}" data-color="#ffffff" title="Soft Daylight"></button>
         </div>
       </div>
     `;
@@ -337,10 +337,10 @@ function generateDeviceCardHTML(dev) {
       <div class="cctv-feed-viewport">
         <div class="cctv-scanline"></div>
         ${dev.power ? `
-          <div class="cctv-rec-badge"><span class="rec-dot"></span> LIVE REC</div>
-          <span class="cctv-feed-text">CCTV 4K • NO MOTION</span>
+          <div class="cctv-rec-badge"><span class="rec-dot"></span> GARDEN LIVE</div>
+          <span class="cctv-feed-text">🌸 Peaceful & Quiet</span>
         ` : `
-          <span class="cctv-feed-text" style="color: var(--text-faint);">Camera Standby</span>
+          <span class="cctv-feed-text" style="color: var(--text-faint);">Camera Resting</span>
         `}
       </div>
     `;
@@ -352,15 +352,15 @@ function generateDeviceCardHTML(dev) {
       <div class="media-ctrl-bar">
         <div class="track-select-box">
           <select class="track-select" data-id="${dev.id}" ${!dev.power ? 'disabled' : ''}>
-            <option value="Lofi Chill Beats" ${dev.track === 'Lofi Chill Beats' ? 'selected' : ''}>📻 Lofi Chill Beats</option>
-            <option value="Synthwave Cyberpunk" ${dev.track === 'Synthwave Cyberpunk' ? 'selected' : ''}>🌃 Synthwave Cyber</option>
-            <option value="Morning Acoustic Jazz" ${dev.track === 'Morning Acoustic Jazz' ? 'selected' : ''}>☕ Morning Jazz</option>
-            <option value="Ambient Rainstorm" ${dev.track === 'Ambient Rainstorm' ? 'selected' : ''}>🌧️ Ambient Rain</option>
+            <option value="Lofi Study Beats ☕" ${dev.track === 'Lofi Study Beats ☕' ? 'selected' : ''}>☕ Lofi Beats</option>
+            <option value="Soft Rain on Leaves 🌧️" ${dev.track === 'Soft Rain on Leaves 🌧️' ? 'selected' : ''}>🌧️ Soft Rain</option>
+            <option value="Cozy Coffeehouse Jazz 🎷" ${dev.track === 'Cozy Coffeehouse Jazz 🎷' ? 'selected' : ''}>🎷 Coffeehouse Jazz</option>
+            <option value="Gentle Ocean Waves 🌊" ${dev.track === 'Gentle Ocean Waves 🌊' ? 'selected' : ''}>🌊 Ocean Waves</option>
           </select>
         </div>
         <div class="media-btns">
-          <button class="btn-media btn-vol-down" data-id="${dev.id}" title="Volume Down" ${!dev.power ? 'disabled' : ''}>🔉</button>
-          <button class="btn-media btn-vol-up" data-id="${dev.id}" title="Volume Up" ${!dev.power ? 'disabled' : ''}>🔊</button>
+          <button class="btn-media btn-vol-down" data-id="${dev.id}" title="Softer" ${!dev.power ? 'disabled' : ''}>🔉</button>
+          <button class="btn-media btn-vol-up" data-id="${dev.id}" title="Louder" ${!dev.power ? 'disabled' : ''}>🔊</button>
         </div>
       </div>
     `;
@@ -368,11 +368,11 @@ function generateDeviceCardHTML(dev) {
 
   // 5. Motorized Blinds
   else if (dev.type === 'blinds') {
-    const slatOpacity = dev.power ? (dev.position / 100) : 0.2;
+    const slatOpacity = dev.power ? (dev.position / 100) : 0.25;
     controlHTML = `
       <div class="slider-control-box">
         <div class="slider-label-row">
-          <span>Open Position</span>
+          <span>Sunlight Opening</span>
           <span>${dev.power ? dev.position : 0}%</span>
         </div>
         <input type="range" min="0" max="100" value="${dev.position}" class="dev-range-slider blinds-slider" data-id="${dev.id}" ${!dev.power ? 'disabled' : ''}>
@@ -390,10 +390,10 @@ function generateDeviceCardHTML(dev) {
     controlHTML = `
       <div class="hvac-widget">
         <div class="hvac-temp-box">
-          <span class="hvac-temp-val" style="color: var(--accent-emerald); font-size: 1.4rem;">${dev.power ? dev.aqi : '--'}</span>
-          <span class="hvac-mode-pill" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">AQI EXCELLENT</span>
+          <span class="hvac-temp-val" style="color: var(--accent-matcha); font-size: 1.4rem;">${dev.power ? dev.aqi : '--'}</span>
+          <span class="hvac-mode-pill" style="background: rgba(82, 183, 136, 0.2); color: #86efac;">PURE AIR 🌿</span>
         </div>
-        <span style="font-size: 0.72rem; color: var(--text-dim); font-weight: 600;">Fan: ${dev.power ? dev.speed : 'Off'}</span>
+        <span style="font-size: 0.74rem; color: var(--text-dim); font-weight: 600;">Fan: ${dev.power ? dev.speed : 'Off'}</span>
       </div>
     `;
   }
@@ -403,7 +403,7 @@ function generateDeviceCardHTML(dev) {
     controlHTML = `
       <button class="btn-brew-coffee ${dev.isBrewing ? 'brewing' : ''}" data-id="${dev.id}">
         <span>☕</span>
-        <span>${dev.isBrewing ? `Brewing Espresso (${dev.brewSeconds}s)...` : 'Brew Fresh Espresso'}</span>
+        <span>${dev.isBrewing ? `Brewing Warm Latte (${dev.brewSeconds}s)...` : 'Brew Fresh Vanilla Latte'}</span>
       </button>
     `;
   }
@@ -413,8 +413,8 @@ function generateDeviceCardHTML(dev) {
     controlHTML = `
       <div class="ev-battery-box">
         <div class="slider-label-row">
-          <span>Battery Charge</span>
-          <span style="color: var(--accent-emerald); font-weight: 700;">${dev.batteryPct}% (${dev.chargeKw} kW)</span>
+          <span>Green Battery Energy</span>
+          <span style="color: var(--accent-honey); font-weight: 700;">${dev.batteryPct}% (${dev.chargeKw} kW)</span>
         </div>
         <div class="ev-progress-bar">
           <div class="ev-fill" style="width: ${dev.batteryPct}%;"></div>
@@ -427,16 +427,16 @@ function generateDeviceCardHTML(dev) {
   else if (dev.type === 'garage-door') {
     controlHTML = `
       <button class="btn btn-secondary btn-garage-toggle" data-id="${dev.id}" style="width: 100%;">
-        <span>🚪</span> ${dev.power ? 'Door Open (Click to Close)' : 'Door Closed (Click to Open)'}
+        <span>🏡</span> ${dev.power ? 'Gate Open (Click to Close)' : 'Gate Closed (Click to Open)'}
       </button>
     `;
   }
 
-  // Custom / General Appliance
+  // Custom Appliance
   else {
     controlHTML = `
-      <div style="font-size: 0.76rem; color: var(--text-dim); padding: 0.25rem 0;">
-        ${dev.power ? '● Device Running Normally' : '○ Standby Mode'}
+      <div style="font-size: 0.78rem; color: var(--text-dim); padding: 0.25rem 0;">
+        ${dev.power ? '● Cozy & Running Happily' : '○ Resting in Standby'}
       </div>
     `;
   }
@@ -447,7 +447,7 @@ function generateDeviceCardHTML(dev) {
   return `
     <div class="device-card ${isActive}" id="card-${dev.id}">
       <div class="dev-header">
-        <div class="dev-icon-box" style="${dev.type === 'light' && dev.power ? `box-shadow: 0 0 16px ${dev.color}88; border-color: ${dev.color};` : ''}">
+        <div class="dev-icon-box" style="${dev.type === 'light' && dev.power ? `box-shadow: 0 0 16px ${dev.color}99; border-color: ${dev.color};` : ''}">
           ${icon}
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -474,31 +474,31 @@ function generateDeviceCardHTML(dev) {
 }
 
 function getDeviceIcon(dev) {
-  if (dev.type === 'light') return '💡';
-  if (dev.type === 'climate') return '❄️';
-  if (dev.type === 'cctv') return '📷';
+  if (dev.type === 'light') return '🕯️';
+  if (dev.type === 'climate') return '🔥';
+  if (dev.type === 'cctv') return '🌸';
   if (dev.type === 'soundbar') return '🎵';
   if (dev.type === 'blinds') return '🪟';
   if (dev.type === 'purifier') return '🍃';
   if (dev.type === 'espresso') return '☕';
   if (dev.type === 'fridge') return '🧊';
-  if (dev.type === 'garage-door') return '🚪';
+  if (dev.type === 'garage-door') return '🏡';
   if (dev.type === 'ev-charger') return '⚡';
   return '🔌';
 }
 
 function getDeviceStatusSummary(dev) {
-  if (!dev.power) return 'Powered Off';
-  if (dev.type === 'light') return `On • ${dev.brightness}% Brightness`;
-  if (dev.type === 'climate') return `Cooling to ${dev.targetTemp}°F`;
-  if (dev.type === 'cctv') return 'Recording Live Feed';
+  if (!dev.power) return 'Resting / Off';
+  if (dev.type === 'light') return `Glowing at ${dev.brightness}% Warmth`;
+  if (dev.type === 'climate') return `Keeping cozy at ${dev.targetTemp}°F`;
+  if (dev.type === 'cctv') return 'Garden Peaceful';
   if (dev.type === 'soundbar') return `Playing: ${dev.track}`;
-  if (dev.type === 'blinds') return `Open • ${dev.position}%`;
-  if (dev.type === 'purifier') return 'Purifying Air';
-  if (dev.type === 'espresso') return dev.isBrewing ? 'Brewing...' : 'Ready to Brew';
-  if (dev.type === 'garage-door') return 'Door Open';
-  if (dev.type === 'ev-charger') return `Fast Charging at ${dev.chargeKw} kW`;
-  return 'Active';
+  if (dev.type === 'blinds') return `Sunlight in • ${dev.position}%`;
+  if (dev.type === 'purifier') return 'Purifying with Fresh Breeze';
+  if (dev.type === 'espresso') return dev.isBrewing ? 'Brewing...' : 'Ready for Warm Coffee';
+  if (dev.type === 'garage-door') return 'Gate Welcoming';
+  if (dev.type === 'ev-charger') return `Charging gently at ${dev.chargeKw} kW`;
+  return 'Active & Happy';
 }
 
 // --- Attach Device Action Listeners ---
@@ -528,7 +528,7 @@ function attachDeviceEventListeners() {
           const badge = card.querySelector('.brightness-val');
           if (badge) badge.textContent = `${dev.brightness}%`;
           const status = card.querySelector('.dev-status-text');
-          if (status) status.textContent = `On • ${dev.brightness}% Brightness`;
+          if (status) status.textContent = `Glowing at ${dev.brightness}% Warmth`;
         }
       }
     });
@@ -611,7 +611,7 @@ function attachDeviceEventListeners() {
         dev.power = !dev.power;
         saveDevices();
         renderApp();
-        showToast(`Garage door ${dev.power ? 'opening' : 'closing'}...`, 'amber');
+        showToast(`Cottage gate ${dev.power ? 'welcoming you in' : 'closing safely'} 🏡`, 'amber');
       }
     });
   });
@@ -622,7 +622,7 @@ function attachDeviceEventListeners() {
       devices = devices.filter(d => d.id !== btn.dataset.id);
       saveDevices();
       renderApp();
-      showToast('Device removed from smart home.', 'danger');
+      showToast('Device removed from sanctuary.', 'danger');
     });
   });
 }
@@ -634,7 +634,7 @@ function startEspressoBrew(dev) {
   dev.brewSeconds = 5;
   saveDevices();
   renderApp();
-  showToast('☕ Brewing rich espresso shot...', 'success');
+  showToast('☕ Steaming sweet vanilla latte...', 'success');
 
   if (brewInterval) clearInterval(brewInterval);
   brewInterval = setInterval(() => {
@@ -644,45 +644,45 @@ function startEspressoBrew(dev) {
       dev.isBrewing = false;
       saveDevices();
       renderApp();
-      showToast('☕ Espresso ready! Enjoy your coffee.', 'success');
+      showToast('☕ Hot vanilla latte ready! Enjoy your cozy drink 🥐', 'success');
     } else {
       renderApp();
     }
   }, 1000);
 }
 
-// --- 1-Click Automation Scenes ---
+// --- 1-Click Cozy Automation Scenes ---
 function triggerScene(sceneName) {
   if (sceneName === 'morning') {
     devices.forEach(d => {
       if (d.type === 'blinds') { d.power = true; d.position = 100; }
       if (d.type === 'climate') { d.power = true; d.targetTemp = 72; }
       if (d.type === 'espresso') { d.power = true; }
-      if (d.room === 'kitchen' && d.type === 'light') { d.power = true; d.brightness = 90; d.color = '#ffffff'; }
-      if (d.type === 'soundbar') { d.power = true; d.track = 'Morning Acoustic Jazz'; }
+      if (d.room === 'kitchen' && d.type === 'light') { d.power = true; d.brightness = 90; d.color = '#fbb03b'; }
+      if (d.type === 'soundbar') { d.power = true; d.track = 'Cozy Coffeehouse Jazz 🎷'; }
     });
-    showToast('🌅 Scene "Good Morning" activated!', 'success');
+    showToast('🥞 Sunny Morning preset activated! Warm sunlight & fresh coffee ☕', 'success');
   }
 
   else if (sceneName === 'movie') {
     devices.forEach(d => {
-      if (d.id === 'living-light') { d.power = true; d.brightness = 20; d.color = '#a855f7'; }
+      if (d.id === 'living-light') { d.power = true; d.brightness = 25; d.color = '#ff8c7a'; }
       if (d.type === 'blinds') { d.position = 0; }
-      if (d.type === 'soundbar') { d.power = true; d.track = 'Synthwave Cyberpunk'; }
+      if (d.type === 'soundbar') { d.power = true; d.track = 'Lofi Study Beats ☕'; }
     });
-    showToast('🎬 Scene "Movie Night" activated!', 'success');
+    showToast('🍿 Cozy Movie Night activated! Warm peach glow & lofi beats ✨', 'success');
   }
 
   else if (sceneName === 'night') {
     devices.forEach(d => {
       if (d.type === 'light') d.power = false;
-      if (d.type === 'soundbar') d.power = false;
+      if (d.type === 'soundbar') { d.power = true; d.track = 'Soft Rain on Leaves 🌧️'; d.volume = 35; }
       if (d.type === 'garage-door') d.power = false;
       if (d.type === 'blinds') d.position = 0;
       if (d.type === 'climate') { d.power = true; d.targetTemp = 68; }
       if (d.type === 'cctv') d.power = true;
     });
-    showToast('🌙 Scene "Good Night" activated: House locked & lights off.', 'amber');
+    showToast('🧸 Sweet Dreams preset activated! Soft rain sounds & cozy 68°F 🌙', 'amber');
   }
 
   else if (sceneName === 'away') {
@@ -690,10 +690,10 @@ function triggerScene(sceneName) {
       if (d.type === 'light') d.power = false;
       if (d.type === 'soundbar') d.power = false;
       if (d.type === 'cctv') d.power = true;
-      if (d.type === 'climate') { d.power = true; d.targetTemp = 78; }
+      if (d.type === 'climate') { d.power = true; d.targetTemp = 76; }
       if (d.type === 'garage-door') d.power = false;
     });
-    showToast('🛡️ Security Armed & Away Mode Active.', 'amber');
+    showToast('🌿 Out & About! Eco mode active, plants happy & safe 🪴', 'amber');
   }
 
   saveDevices();
@@ -711,7 +711,7 @@ function toggleCurrentRoom() {
 
   saveDevices();
   renderApp();
-  showToast(`Toggled ${roomDevs.length} devices in current view.`, 'success');
+  showToast(`Switched ${roomDevs.length} cozy accessories.`, 'success');
 }
 
 // --- Add Custom Device Form ---
@@ -720,7 +720,7 @@ function handleAddDevice(e) {
   const name = document.getElementById('dev-name').value.trim();
   const room = document.getElementById('dev-room').value;
   const type = document.getElementById('dev-type').value;
-  const power = parseInt(document.getElementById('dev-power').value) || 45;
+  const power = parseInt(document.getElementById('dev-power').value) || 35;
 
   if (!name) return;
 
@@ -731,7 +731,7 @@ function handleAddDevice(e) {
     type,
     power: true,
     brightness: 80,
-    color: '#38bdf8',
+    color: '#ff8c7a',
     targetTemp: 72,
     watts: power,
     custom: true
@@ -742,7 +742,7 @@ function handleAddDevice(e) {
   modalAddDevice.classList.add('hidden');
   formAddDevice.reset();
   renderApp();
-  showToast(`Added "${name}" to smart home!`, 'success');
+  showToast(`✨ Added "${name}" to your cozy home! 🌸`, 'success');
 }
 
 // --- Toast System ---
@@ -794,11 +794,11 @@ function initEventListeners() {
 
   // Reset Demo
   elBtnResetDemo.addEventListener('click', () => {
-    if (confirm('Reset smart home devices to default factory preset?')) {
+    if (confirm('Reset your home sanctuary to the default cozy setup?')) {
       devices = JSON.parse(JSON.stringify(DEFAULT_DEVICES));
       saveDevices();
       renderApp();
-      showToast('Smart home reset to default setup.', 'success');
+      showToast('Sanctuary restored to cozy factory preset! ☕', 'success');
     }
   });
 
