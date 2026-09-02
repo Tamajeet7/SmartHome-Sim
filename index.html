@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CozyHome 🏡 — Your Warm & Smart Sanctuary</title>
-    <meta name="description" content="A cute, cozy smart home simulator with warm lighting, aroma diffuser, coffee bar, and soothing ambient scenes." />
+    <meta name="description" content="A cute, cozy smart home simulator with warm lighting, aroma diffuser, coffee bar, interactive tutorial, and customizable devices." />
     <link rel="stylesheet" href="/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <body>
     <div id="app-container">
       
-      <!-- Top Cozy Welcome & Weather Header -->
+      <!-- Top Navigation & Sanctuary Header -->
       <header class="hub-header glass-panel">
         <div class="header-left">
           <div class="brand-badge-box">
@@ -22,78 +22,132 @@
             <div class="brand-details">
               <div class="brand-title-row">
                 <span class="brand-name">CozyHome</span>
-                <span class="online-pill">✨ COZY & WARM</span>
+                <span class="online-pill">✨ WARM SANCTUARY</span>
               </div>
-              <p id="system-quick-status" class="brand-subtext">Everything feels just right ☕</p>
+              <p id="system-quick-status" class="brand-subtext">Everything feels peaceful & cozy ☕</p>
             </div>
           </div>
         </div>
 
-        <!-- Telemetry Summary Cards -->
-        <div class="header-telemetry">
-          <div class="telemetry-card">
-            <span class="tel-label">Active Devices</span>
-            <span id="tel-active-devices" class="tel-value">0 / 0</span>
-          </div>
-          <div class="telemetry-card">
-            <span class="tel-label">Power Usage</span>
-            <span id="tel-power-draw" class="tel-value text-peach">0 W</span>
-          </div>
-          <div class="telemetry-card">
-            <span class="tel-label">Solar Sunshine</span>
-            <span id="tel-solar-output" class="tel-value text-honey">☀️ +4.8 kW</span>
-          </div>
-          <div class="telemetry-card weather-card">
-            <div class="weather-icon">🌤️</div>
-            <div class="weather-info">
-              <span id="weather-temp" class="weather-temp">74°F</span>
-              <span class="weather-desc">Warm & Breezy 🌸</span>
-            </div>
+        <!-- Navigation Tabs -->
+        <div class="nav-view-tabs">
+          <button class="nav-tab active" data-view="dashboard">
+            <span>🏡</span> My Sanctuary
+          </button>
+          <button class="nav-tab" data-view="tutorial">
+            <span>📖</span> How It Works
+          </button>
+        </div>
+
+        <!-- Global Actions & Weather -->
+        <div class="header-right-actions">
+          <button id="btn-sample-data" class="btn btn-secondary btn-sm" title="Preview sample cozy home setup">
+            <span>⚡</span> <span id="demo-btn-label">Demo Setup</span>
+          </button>
+          <button id="btn-add-device-modal" class="btn btn-primary btn-sm" title="Add custom IoT smart device">
+            <span>＋</span> Add Device
+          </button>
+          
+          <div class="weather-badge">
+            <span class="weather-icon">🌤️</span>
+            <span class="weather-temp">74°F Warm & Breezy</span>
           </div>
         </div>
       </header>
 
-      <!-- 1-Click Cozy Automation Scenes Bar -->
-      <section class="scenes-section glass-panel">
-        <div class="section-tag">
-          <span>✨ COZY MOOD PRESETS</span>
+      <!-- Demo Notification Bar (When active) -->
+      <div id="demo-mode-bar" class="demo-banner-bar glass-panel hidden">
+        <div class="demo-bar-text">
+          <span class="demo-badge">⚡ SAMPLE PREVIEW MODE</span>
+          <span>You are exploring the sample cozy setup. Your real sanctuary is safely preserved.</span>
         </div>
-        <div class="scenes-grid">
-          <button class="scene-btn" data-scene="morning" id="scene-morning">
-            <span class="scene-icon">🥞</span>
-            <div class="scene-text">
-              <strong>Sunny Morning</strong>
-              <small>Blinds open, fresh latte, 72°F</small>
-            </div>
-          </button>
-          <button class="scene-btn" data-scene="movie" id="scene-movie">
-            <span class="scene-icon">🍿</span>
-            <div class="scene-text">
-              <strong>Cozy Movie Night</strong>
-              <small>Warm peach glow, lofi chill, blinds down</small>
-            </div>
-          </button>
-          <button class="scene-btn" data-scene="night" id="scene-night">
-            <span class="scene-icon">🧸</span>
-            <div class="scene-text">
-              <strong>Sweet Dreams</strong>
-              <small>Rain sounds, doors locked, 68°F</small>
-            </div>
-          </button>
-          <button class="scene-btn" data-scene="away" id="scene-away">
-            <span class="scene-icon">🌿</span>
-            <div class="scene-text">
-              <strong>Out & About</strong>
-              <small>Eco mode, security on, plants happy</small>
-            </div>
-          </button>
-        </div>
-      </section>
+        <button id="btn-revert-real-data" class="btn-revert">
+          ↩️ Return to My Sanctuary (<span id="user-dev-count-badge">0</span> devices)
+        </button>
+      </div>
 
-      <!-- Main Hub Body -->
-      <main class="hub-main">
-        
-        <!-- Room Selector Tabs Bar & Action Row -->
+      <!-- ======================================================== -->
+      <!-- VIEW 1: MY SANCTUARY (Dashboard)                         -->
+      <!-- ======================================================== -->
+      <div id="view-dashboard" class="view-content active-view">
+
+        <!-- Telemetry Summary Cards Row -->
+        <section class="telemetry-grid">
+          <div class="telemetry-card glass-panel">
+            <div class="tel-card-header">
+              <span class="tel-label">Active Accessories</span>
+              <span class="tel-icon">💡</span>
+            </div>
+            <span id="tel-active-devices" class="tel-value">0 / 0</span>
+            <span class="tel-hint">Real-time status</span>
+          </div>
+
+          <div class="telemetry-card glass-panel">
+            <div class="tel-card-header">
+              <span class="tel-label">Power Consumption</span>
+              <span class="tel-icon">⚡</span>
+            </div>
+            <span id="tel-power-draw" class="tel-value text-peach">0 W</span>
+            <span class="tel-hint">Dynamic energy load</span>
+          </div>
+
+          <div class="telemetry-card glass-panel">
+            <div class="tel-card-header">
+              <span class="tel-label">Solar Generation</span>
+              <span class="tel-icon">☀️</span>
+            </div>
+            <span id="tel-solar-output" class="tel-value text-honey">+4.8 kW</span>
+            <span class="tel-hint">Clean rooftop energy</span>
+          </div>
+
+          <div class="telemetry-card glass-panel">
+            <div class="tel-card-header">
+              <span class="tel-label">Sanctuary Comfort</span>
+              <span class="tel-icon">🍃</span>
+            </div>
+            <span id="tel-comfort-score" class="tel-value text-matcha">100% Cozy</span>
+            <span class="tel-hint">Optimal environment</span>
+          </div>
+        </section>
+
+        <!-- 1-Click Cozy Mood Presets -->
+        <section class="scenes-section glass-panel">
+          <div class="section-tag">
+            <span>✨ 1-CLICK COZY MOOD PRESETS</span>
+          </div>
+          <div class="scenes-grid">
+            <button class="scene-btn" data-scene="morning" id="scene-morning">
+              <span class="scene-icon">🥞</span>
+              <div class="scene-text">
+                <strong>Sunny Morning</strong>
+                <small>Blinds open, fresh latte, 72°F</small>
+              </div>
+            </button>
+            <button class="scene-btn" data-scene="movie" id="scene-movie">
+              <span class="scene-icon">🍿</span>
+              <div class="scene-text">
+                <strong>Cozy Movie Night</strong>
+                <small>Warm peach glow, lofi chill, blinds down</small>
+              </div>
+            </button>
+            <button class="scene-btn" data-scene="night" id="scene-night">
+              <span class="scene-icon">🧸</span>
+              <div class="scene-text">
+                <strong>Sweet Dreams</strong>
+                <small>Rain sounds, gates closed, 68°F</small>
+              </div>
+            </button>
+            <button class="scene-btn" data-scene="away" id="scene-away">
+              <span class="scene-icon">🌿</span>
+              <div class="scene-text">
+                <strong>Out & About</strong>
+                <small>Eco mode, security on, plants happy</small>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <!-- Room Selector Tabs Bar -->
         <div class="room-nav-bar">
           <div class="room-tabs" id="room-tabs">
             <button class="room-tab active" data-room="living">
@@ -117,18 +171,100 @@
             <button id="btn-toggle-all-room" class="btn btn-secondary btn-sm" title="Toggle all devices in current room">
               <span class="btn-icon">💡</span> Toggle Room
             </button>
-            <button id="btn-add-device-modal" class="btn btn-primary btn-sm" title="Add custom IoT smart device">
-              <span class="btn-icon">＋</span> Add Device
-            </button>
+          </div>
+        </div>
+
+        <!-- Welcome Hero Banner (Shows when sanctuary is empty) -->
+        <div id="sanctuary-empty-hero" class="empty-hero glass-panel hidden">
+          <div class="empty-hero-content">
+            <span class="empty-hero-badge">🌱 Fresh Empty Sanctuary</span>
+            <h2>Welcome to Your Blank Cozy Canvas</h2>
+            <p>Your smart home starts completely empty so you can design every room exactly the way you want! Add your favorite fairy lights, coffee machine, ambient lamps, or explore the demo setup.</p>
+            <div class="empty-hero-actions">
+              <button id="btn-hero-add" class="btn btn-primary">
+                <span>＋</span> Add First Smart Device
+              </button>
+              <button id="btn-hero-sample" class="btn btn-secondary">
+                <span>⚡</span> Load Sample Cozy Setup
+              </button>
+              <button id="btn-hero-tutorial" class="btn btn-secondary">
+                <span>📖</span> View How-To Guide
+              </button>
+            </div>
           </div>
         </div>
 
         <!-- Devices Grid -->
         <div class="devices-grid" id="devices-container">
-          <!-- Dynamically populated room device cards -->
+          <!-- Dynamically rendered device cards -->
         </div>
 
-      </main>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- VIEW 2: HOW IT WORKS (Tutorial Guide)                    -->
+      <!-- ======================================================== -->
+      <div id="view-tutorial" class="view-content hidden">
+        <section class="tutorial-hero glass-panel">
+          <div class="tutorial-header">
+            <span class="badge-tutorial">📖 Cozy Smart Home Academy</span>
+            <h2>How to Build & Automate Your Cozy Sanctuary</h2>
+            <p>Discover how easy it is to create comforting automation scenes, customize ambient lighting, and monitor your household energy with CozyHome.</p>
+          </div>
+
+          <div class="tutorial-grid">
+            <!-- Step 1 -->
+            <div class="tutorial-card glass-panel">
+              <div class="t-step-num">01</div>
+              <div class="t-icon">🛋️</div>
+              <h3>1. Organize by Cozy Rooms</h3>
+              <p>Segment your home into <strong>Cozy Living</strong>, <strong>Comfy Bedroom</strong>, <strong>Warm Kitchen</strong>, and <strong>Garden & Garage</strong> to keep controls organized and uncluttered.</p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="tutorial-card glass-panel">
+              <div class="t-step-num">02</div>
+              <div class="t-icon">🕯️</div>
+              <h3>2. Add Warm Ambient Lights</h3>
+              <p>Add smart fairy lights, chandeliers, or bedside lamps. Adjust brightness sliders and select cozy color presets like <em>Peach Sunset</em>, <em>Candlelight Amber</em>, or <em>Cozy Matcha</em>.</p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="tutorial-card glass-panel">
+              <div class="t-step-num">03</div>
+              <div class="t-icon">☕</div>
+              <h3>3. Smart Appliances & Routines</h3>
+              <p>Equip your kitchen with an espresso bar to brew vanilla lattes, motorized blinds to welcome morning sunlight, and an air purifier for pure fresh breezes.</p>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="tutorial-card glass-panel">
+              <div class="t-step-num">04</div>
+              <div class="t-icon">✨</div>
+              <h3>4. 1-Click Mood Scenes</h3>
+              <p>Trigger instant whole-house transformations: <strong>🥞 Sunny Morning</strong> to wake up gently, <strong>🍿 Movie Night</strong> for warm dim tones, or <strong>🧸 Sweet Dreams</strong> for soothing rain sounds.</p>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="tutorial-card glass-panel">
+              <div class="t-step-num">05</div>
+              <div class="t-icon">☀️</div>
+              <h3>5. Track Real-Time Energy</h3>
+              <p>Watch your live wattage load automatically calculate as you switch accessories on and off, balanced by clean rooftop solar generation.</p>
+            </div>
+
+            <!-- CTA Card -->
+            <div class="tutorial-card glass-panel t-cta-card">
+              <div class="t-icon">🌸</div>
+              <h3>Ready to Create Your Home?</h3>
+              <p>Step into your sanctuary and begin adding your smart devices!</p>
+              <button id="btn-tutorial-go-dash" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">
+                Open My Sanctuary Now →
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
 
       <!-- Bottom Audio Visualizer & System Status -->
       <footer class="hub-footer glass-panel">
@@ -147,25 +283,41 @@
         </div>
 
         <div class="footer-right">
-          <button id="btn-reset-demo" class="btn-link" title="Reset to default smart home setup">
-            🔄 Reset Sanctuary
+          <button id="btn-clear-sanctuary" class="btn-link" title="Clear all devices to empty slate">
+            🗑️ Clear Sanctuary
           </button>
           <span class="footer-sep">|</span>
-          <span>Made with love for a cozy home 💛</span>
+          <button id="btn-reset-demo" class="btn-link" title="Reset to default smart home setup">
+            🔄 Load Sample Setup
+          </button>
         </div>
       </footer>
 
     </div>
 
     <!-- ======================================================== -->
-    <!-- MODAL: ADD CUSTOM IOT DEVICE                             -->
+    <!-- MODAL: ADD CUSTOM IOT DEVICE WITH QUICK PRESETS          -->
     <!-- ======================================================== -->
     <div id="add-device-modal" class="modal-overlay hidden">
       <div class="modal-card glass-panel">
         <div class="modal-header">
-          <h3>✨ Add a New Smart Device</h3>
+          <h3>✨ Add a Smart Device</h3>
           <button id="btn-close-device-modal" class="btn-modal-close">✕</button>
         </div>
+
+        <!-- Quick Starter Presets Chips -->
+        <div class="quick-preset-section">
+          <span class="preset-label">Quick Starter Presets:</span>
+          <div class="preset-chips">
+            <button class="btn-chip" data-name="Warm Fairy Lights" data-room="living" data-type="light" data-power="25">🕯️ Fairy Lights</button>
+            <button class="btn-chip" data-name="Artisan Espresso Machine" data-room="kitchen" data-type="espresso" data-power="950">☕ Espresso Bar</button>
+            <button class="btn-chip" data-name="Motorized Sun Blinds" data-room="bedroom" data-type="blinds" data-power="10">🪟 Sun Blinds</button>
+            <button class="btn-chip" data-name="Living Room Speaker" data-room="living" data-type="soundbar" data-power="30">🎵 Cozy Speaker</button>
+            <button class="btn-chip" data-name="Breeze Air Purifier" data-room="bedroom" data-type="purifier" data-power="20">🍃 Air Purifier</button>
+            <button class="btn-chip" data-name="Garden Porch Cam" data-room="garage" data-type="cctv" data-power="12">🌸 Garden Cam</button>
+          </div>
+        </div>
+
         <form id="add-device-form">
           <div class="form-group">
             <label for="dev-name">Device Name</label>
@@ -187,9 +339,15 @@
               <label for="dev-type">Device Type</label>
               <select id="dev-type" required>
                 <option value="light">🕯️ Cozy Warm Light</option>
-                <option value="appliance">🔌 Smart Appliance</option>
-                <option value="climate">🍃 Gentle Fan / Climate</option>
-                <option value="security">📷 Garden Cam / Sensor</option>
+                <option value="appliance">🔌 Smart Plug / Appliance</option>
+                <option value="climate">🔥 Fireplace / Climate</option>
+                <option value="espresso">☕ Coffee / Espresso Bar</option>
+                <option value="blinds">🪟 Motorized Blinds</option>
+                <option value="soundbar">🎵 Cozy Speaker</option>
+                <option value="purifier">🍃 Air Purifier</option>
+                <option value="cctv">🌸 Garden Cam</option>
+                <option value="garage-door">🏡 Cottage Gate</option>
+                <option value="ev-charger">⚡ EV Charger</option>
               </select>
             </div>
           </div>
@@ -207,7 +365,7 @@
       </div>
     </div>
 
-    <!-- Toast Notifications -->
+    <!-- Toast Notifications Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <script type="module" src="/main.js"></script>

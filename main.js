@@ -1,6 +1,6 @@
 // --- CozyHome Smart IoT State & Device Registry ---
 
-const DEFAULT_DEVICES = [
+const SAMPLE_COZY_DEVICES = [
   // Cozy Living
   {
     id: 'living-light',
@@ -37,7 +37,7 @@ const DEFAULT_DEVICES = [
   {
     id: 'living-soundbar',
     room: 'living',
-    name: 'Cozy Living Speaker',
+    name: 'Living Room Speaker',
     type: 'soundbar',
     power: true,
     track: 'Lofi Study Beats ☕',
@@ -79,15 +79,6 @@ const DEFAULT_DEVICES = [
     watts: 20,
     custom: false
   },
-  {
-    id: 'bedroom-noise',
-    room: 'bedroom',
-    name: 'Sleepy Rain Generator',
-    type: 'appliance',
-    power: false,
-    watts: 8,
-    custom: false
-  },
 
   // Warm Kitchen
   {
@@ -99,18 +90,6 @@ const DEFAULT_DEVICES = [
     isBrewing: false,
     brewSeconds: 0,
     watts: 950,
-    custom: false
-  },
-  {
-    id: 'kitchen-fridge',
-    room: 'kitchen',
-    name: 'Cozy Pantry Refrigerator',
-    type: 'fridge',
-    power: true,
-    fridgeTemp: 37,
-    freezerTemp: 0,
-    doorOpen: false,
-    watts: 140,
     custom: false
   },
   {
@@ -131,7 +110,7 @@ const DEFAULT_DEVICES = [
     room: 'garage',
     name: 'Cottage Garage & Gate',
     type: 'garage-door',
-    power: false, // Closed
+    power: false,
     state: 'Closed',
     watts: 100,
     custom: false
@@ -146,40 +125,47 @@ const DEFAULT_DEVICES = [
     chargeKw: 9.6,
     watts: 1800,
     custom: false
-  },
-  {
-    id: 'garage-flood',
-    room: 'garage',
-    name: 'Garden Path Lights',
-    type: 'light',
-    power: false,
-    brightness: 100,
-    color: '#ff8c7a',
-    watts: 60,
-    custom: false
   }
 ];
 
 // --- Application State ---
 let devices = [];
+let userSavedDevices = [];
+let isDemoMode = false;
 let currentRoom = 'living';
+let activeView = 'dashboard';
 let brewInterval = null;
 
-// --- DOM Elements ---
+// --- DOM References ---
+const elNavTabs = document.querySelectorAll('.nav-tab');
+const elViews = {
+  dashboard: document.getElementById('view-dashboard'),
+  tutorial: document.getElementById('view-tutorial')
+};
+
 const elRoomTabs = document.querySelectorAll('.room-tab');
 const elDevicesContainer = document.getElementById('devices-container');
+const elEmptyHero = document.getElementById('sanctuary-empty-hero');
 const elQuickStatus = document.getElementById('system-quick-status');
 
 // Header Telemetry
 const elTelActiveDevices = document.getElementById('tel-active-devices');
 const elTelPowerDraw = document.getElementById('tel-power-draw');
 const elTelSolarOutput = document.getElementById('tel-solar-output');
-const elWeatherTemp = document.getElementById('weather-temp');
+const elTelComfortScore = document.getElementById('tel-comfort-score');
+
+// Demo Bar & Revert Controls
+const elDemoBar = document.getElementById('demo-mode-bar');
+const elDemoBtnLabel = document.getElementById('demo-btn-label');
+const elBtnSampleData = document.getElementById('btn-sample-data');
+const elBtnRevertData = document.getElementById('btn-revert-real-data');
+const elUserDevCountBadge = document.getElementById('user-dev-count-badge');
 
 // Footer Elements
 const elFooterPlaying = document.getElementById('footer-now-playing');
 const elFooterEqualizer = document.getElementById('footer-equalizer');
 const elBtnResetDemo = document.getElementById('btn-reset-demo');
+const elBtnClearSanctuary = document.getElementById('btn-clear-sanctuary');
 
 // Actions & Modals
 const elBtnToggleRoom = document.getElementById('btn-toggle-all-room');
@@ -189,41 +175,105 @@ const formAddDevice = document.getElementById('add-device-form');
 const btnCloseModal = document.getElementById('btn-close-device-modal');
 const btnCancelModal = document.getElementById('btn-cancel-device-modal');
 
+// Hero Actions
+const btnHeroAdd = document.getElementById('btn-hero-add');
+const btnHeroSample = document.getElementById('btn-hero-sample');
+const btnHeroTutorial = document.getElementById('btn-hero-tutorial');
+const btnTutorialGoDash = document.getElementById('btn-tutorial-go-dash');
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
   loadDevices();
   initEventListeners();
+  switchView('dashboard');
   renderApp();
 });
 
 // --- Storage Management ---
 function loadDevices() {
   try {
-    const saved = localStorage.getItem('cozyhome_devices_v3');
+    const saved = localStorage.getItem('cozyhome_user_devices_v4');
     if (saved) {
-      devices = JSON.parse(saved);
+      userSavedDevices = JSON.parse(saved);
     } else {
-      devices = JSON.parse(JSON.stringify(DEFAULT_DEVICES));
+      // Clean slate by default for new user
+      userSavedDevices = [];
     }
+
+    isDemoMode = false;
+    devices = [...userSavedDevices];
   } catch (err) {
     console.error('Error loading devices from localStorage:', err);
-    devices = JSON.parse(JSON.stringify(DEFAULT_DEVICES));
+    userSavedDevices = [];
+    devices = [];
   }
 }
 
-function saveDevices() {
+function saveUserDevices() {
   try {
-    localStorage.setItem('cozyhome_devices_v3', JSON.stringify(devices));
+    if (!isDemoMode) {
+      userSavedDevices = [...devices];
+    }
+    localStorage.setItem('cozyhome_user_devices_v4', JSON.stringify(userSavedDevices));
   } catch (err) {
     console.error('Error saving devices:', err);
   }
 }
 
+// --- View Switching ---
+function switchView(viewName) {
+  activeView = viewName;
+
+  elNavTabs.forEach(tab => {
+    if (tab.dataset.view === viewName) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+
+  Object.keys(elViews).forEach(key => {
+    if (key === viewName) {
+      elViews[key].classList.remove('hidden');
+    } else {
+      elViews[key].classList.add('hidden');
+    }
+  });
+
+  if (viewName === 'dashboard') {
+    renderApp();
+  }
+}
+
 // --- Render Core App ---
 function renderApp() {
+  updateDemoStateUI();
   renderDevicesGrid();
   updateTelemetry();
   updateFooterAudio();
+}
+
+// --- Demo State UI Updates ---
+function updateDemoStateUI() {
+  if (elUserDevCountBadge) {
+    elUserDevCountBadge.textContent = userSavedDevices.length;
+  }
+
+  if (isDemoMode) {
+    if (elDemoBar) elDemoBar.classList.remove('hidden');
+    if (elDemoBtnLabel) elDemoBtnLabel.textContent = 'My Real Setup';
+    if (elBtnSampleData) {
+      elBtnSampleData.classList.add('btn-primary');
+      elBtnSampleData.classList.remove('btn-secondary');
+    }
+  } else {
+    if (elDemoBar) elDemoBar.classList.add('hidden');
+    if (elDemoBtnLabel) elDemoBtnLabel.textContent = 'Demo Setup';
+    if (elBtnSampleData) {
+      elBtnSampleData.classList.remove('btn-primary');
+      elBtnSampleData.classList.add('btn-secondary');
+    }
+  }
 }
 
 // --- Telemetry & Header Status ---
@@ -240,6 +290,12 @@ function updateTelemetry() {
 
   elTelPowerDraw.textContent = `${totalWatts.toLocaleString()} W`;
 
+  if (totalCount === 0) {
+    elTelComfortScore.textContent = 'Ready to Build';
+  } else {
+    elTelComfortScore.textContent = `${Math.min(100, Math.round((activeCount / totalCount) * 100))}% Active`;
+  }
+
   const roomNameMap = {
     living: 'Cozy Living',
     bedroom: 'Comfy Bedroom',
@@ -251,7 +307,11 @@ function updateTelemetry() {
   const currentRoomName = roomNameMap[currentRoom] || 'Cozy Living';
   const roomActive = devices.filter(d => (currentRoom === 'all' || d.room === currentRoom) && d.power).length;
 
-  elQuickStatus.textContent = `${currentRoomName}: ${roomActive} active accessories • Everything warm & safe 🪴`;
+  if (devices.length === 0) {
+    elQuickStatus.textContent = 'Sanctuary is empty & ready for your smart devices 🌱';
+  } else {
+    elQuickStatus.textContent = `${currentRoomName}: ${roomActive} active accessories • Everything warm & safe 🪴`;
+  }
 }
 
 // --- Footer Soundbar Visualizer ---
@@ -268,6 +328,15 @@ function updateFooterAudio() {
 
 // --- Devices Grid Renderer ---
 function renderDevicesGrid() {
+  // Empty Hero handling
+  if (devices.length === 0 && !isDemoMode) {
+    elEmptyHero.classList.remove('hidden');
+    elDevicesContainer.innerHTML = '';
+    return;
+  }
+
+  elEmptyHero.classList.add('hidden');
+
   const filtered = devices.filter(d => {
     if (currentRoom === 'all') return true;
     return d.room === currentRoom;
@@ -277,8 +346,8 @@ function renderDevicesGrid() {
     elDevicesContainer.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-dim);">
         <p style="font-size: 2.2rem; margin-bottom: 0.5rem;">🪴</p>
-        <h3>No devices in this cozy corner yet</h3>
-        <p style="font-size: 0.85rem; margin-top: 4px;">Click <strong>＋ Add Device</strong> to add warm accessories.</p>
+        <h3>No devices in this room yet</h3>
+        <p style="font-size: 0.85rem; margin-top: 4px;">Click <strong>＋ Add Device</strong> to add cozy accessories.</p>
       </div>
     `;
     return;
@@ -337,7 +406,7 @@ function generateDeviceCardHTML(dev) {
       <div class="cctv-feed-viewport">
         <div class="cctv-scanline"></div>
         ${dev.power ? `
-          <div class="cctv-rec-badge"><span class="rec-dot"></span> GARDEN LIVE</div>
+          <div class="cctv-rec-badge"><span class="rec-dot"></span> LIVE CAM</div>
           <span class="cctv-feed-text">🌸 Peaceful & Quiet</span>
         ` : `
           <span class="cctv-feed-text" style="color: var(--text-faint);">Camera Resting</span>
@@ -451,7 +520,7 @@ function generateDeviceCardHTML(dev) {
           ${icon}
         </div>
         <div style="display: flex; align-items: center; gap: 0.5rem;">
-          ${dev.custom ? `<button class="btn-dev-delete" data-id="${dev.id}" title="Remove device">✕</button>` : ''}
+          <button class="btn-dev-delete" data-id="${dev.id}" title="Remove device">✕</button>
           <label class="switch">
             <input type="checkbox" class="toggle-device-power" data-id="${dev.id}" ${dev.power ? 'checked' : ''}>
             <span class="slider"></span>
@@ -509,7 +578,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === toggle.dataset.id);
       if (dev) {
         dev.power = e.target.checked;
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -521,7 +590,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === slider.dataset.id);
       if (dev) {
         dev.brightness = parseInt(e.target.value);
-        saveDevices();
+        saveUserDevices();
         updateTelemetry();
         const card = document.getElementById(`card-${dev.id}`);
         if (card) {
@@ -540,7 +609,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === btn.dataset.id);
       if (dev) {
         dev.color = btn.dataset.color;
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -552,7 +621,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === btn.dataset.id);
       if (dev && dev.targetTemp > 60) {
         dev.targetTemp--;
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -563,7 +632,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === btn.dataset.id);
       if (dev && dev.targetTemp < 85) {
         dev.targetTemp++;
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -575,7 +644,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === sel.dataset.id);
       if (dev) {
         dev.track = e.target.value;
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -587,7 +656,7 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === slider.dataset.id);
       if (dev) {
         dev.position = parseInt(e.target.value);
-        saveDevices();
+        saveUserDevices();
         renderApp();
       }
     });
@@ -609,18 +678,18 @@ function attachDeviceEventListeners() {
       const dev = devices.find(d => d.id === btn.dataset.id);
       if (dev) {
         dev.power = !dev.power;
-        saveDevices();
+        saveUserDevices();
         renderApp();
         showToast(`Cottage gate ${dev.power ? 'welcoming you in' : 'closing safely'} 🏡`, 'amber');
       }
     });
   });
 
-  // 9. Delete Custom Device
+  // 9. Delete Device
   elDevicesContainer.querySelectorAll('.btn-dev-delete').forEach(btn => {
     btn.addEventListener('click', () => {
       devices = devices.filter(d => d.id !== btn.dataset.id);
-      saveDevices();
+      saveUserDevices();
       renderApp();
       showToast('Device removed from sanctuary.', 'danger');
     });
@@ -632,7 +701,7 @@ function startEspressoBrew(dev) {
   dev.isBrewing = true;
   dev.power = true;
   dev.brewSeconds = 5;
-  saveDevices();
+  saveUserDevices();
   renderApp();
   showToast('☕ Steaming sweet vanilla latte...', 'success');
 
@@ -642,7 +711,7 @@ function startEspressoBrew(dev) {
     if (dev.brewSeconds <= 0) {
       clearInterval(brewInterval);
       dev.isBrewing = false;
-      saveDevices();
+      saveUserDevices();
       renderApp();
       showToast('☕ Hot vanilla latte ready! Enjoy your cozy drink 🥐', 'success');
     } else {
@@ -653,6 +722,11 @@ function startEspressoBrew(dev) {
 
 // --- 1-Click Cozy Automation Scenes ---
 function triggerScene(sceneName) {
+  if (devices.length === 0) {
+    showToast('Add smart devices to your sanctuary first to activate scenes! 🌸', 'amber');
+    return;
+  }
+
   if (sceneName === 'morning') {
     devices.forEach(d => {
       if (d.type === 'blinds') { d.power = true; d.position = 100; }
@@ -666,7 +740,7 @@ function triggerScene(sceneName) {
 
   else if (sceneName === 'movie') {
     devices.forEach(d => {
-      if (d.id === 'living-light') { d.power = true; d.brightness = 25; d.color = '#ff8c7a'; }
+      if (d.id === 'living-light' || d.type === 'light') { d.power = true; d.brightness = 25; d.color = '#ff8c7a'; }
       if (d.type === 'blinds') { d.position = 0; }
       if (d.type === 'soundbar') { d.power = true; d.track = 'Lofi Study Beats ☕'; }
     });
@@ -696,22 +770,63 @@ function triggerScene(sceneName) {
     showToast('🌿 Out & About! Eco mode active, plants happy & safe 🪴', 'amber');
   }
 
-  saveDevices();
+  saveUserDevices();
   renderApp();
 }
 
 // --- Toggle Entire Room ---
 function toggleCurrentRoom() {
   const roomDevs = devices.filter(d => currentRoom === 'all' || d.room === currentRoom);
+  if (roomDevs.length === 0) return;
+
   const anyOn = roomDevs.some(d => d.power);
 
   roomDevs.forEach(d => {
     d.power = !anyOn;
   });
 
-  saveDevices();
+  saveUserDevices();
   renderApp();
   showToast(`Switched ${roomDevs.length} cozy accessories.`, 'success');
+}
+
+// --- Demo Mode & Revert System ---
+function toggleDemoMode() {
+  if (isDemoMode) {
+    revertToUserSanctuary();
+  } else {
+    loadSampleSanctuary();
+  }
+}
+
+function loadSampleSanctuary() {
+  if (!isDemoMode) {
+    userSavedDevices = [...devices];
+    saveUserDevices();
+  }
+
+  isDemoMode = true;
+  devices = JSON.parse(JSON.stringify(SAMPLE_COZY_DEVICES));
+  renderApp();
+  showToast('⚡ Sample Cozy Setup loaded! Click "Return" anytime to restore your setup.', 'success');
+}
+
+function revertToUserSanctuary() {
+  isDemoMode = false;
+  devices = [...userSavedDevices];
+  renderApp();
+  showToast(`↩️ Returned to your personal sanctuary (${devices.length} devices)!`, 'success');
+}
+
+function clearSanctuary() {
+  if (confirm('Clear all smart devices from your personal sanctuary?')) {
+    isDemoMode = false;
+    devices = [];
+    userSavedDevices = [];
+    saveUserDevices();
+    renderApp();
+    showToast('Sanctuary cleared to a fresh clean slate 🌱', 'amber');
+  }
 }
 
 // --- Add Custom Device Form ---
@@ -724,6 +839,12 @@ function handleAddDevice(e) {
 
   if (!name) return;
 
+  // If adding while in demo mode, automatically switch to personal sanctuary!
+  if (isDemoMode) {
+    isDemoMode = false;
+    devices = [...userSavedDevices];
+  }
+
   const newDevice = {
     id: 'custom-' + Date.now(),
     room,
@@ -733,12 +854,13 @@ function handleAddDevice(e) {
     brightness: 80,
     color: '#ff8c7a',
     targetTemp: 72,
+    position: 80,
     watts: power,
     custom: true
   };
 
-  devices.push(newDevice);
-  saveDevices();
+  devices.unshift(newDevice);
+  saveUserDevices();
   modalAddDevice.classList.add('hidden');
   formAddDevice.reset();
   renderApp();
@@ -768,6 +890,18 @@ function escapeHtml(str) {
 
 // --- Event Listeners Setup ---
 function initEventListeners() {
+  // Navigation Tabs
+  elNavTabs.forEach(tab => {
+    tab.addEventListener('click', () => switchView(tab.dataset.view));
+  });
+
+  if (btnTutorialGoDash) btnTutorialGoDash.addEventListener('click', () => switchView('dashboard'));
+  if (btnHeroTutorial) btnHeroTutorial.addEventListener('click', () => switchView('tutorial'));
+
+  // Hero Actions
+  if (btnHeroAdd) btnHeroAdd.addEventListener('click', () => modalAddDevice.classList.remove('hidden'));
+  if (btnHeroSample) btnHeroSample.addEventListener('click', loadSampleSanctuary);
+
   // Room Tabs
   elRoomTabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -783,6 +917,12 @@ function initEventListeners() {
     btn.addEventListener('click', () => triggerScene(btn.dataset.scene));
   });
 
+  // Demo & Revert Action
+  elBtnSampleData.addEventListener('click', toggleDemoMode);
+  if (elBtnRevertData) elBtnRevertData.addEventListener('click', revertToUserSanctuary);
+  if (elBtnResetDemo) elBtnResetDemo.addEventListener('click', loadSampleSanctuary);
+  if (elBtnClearSanctuary) elBtnClearSanctuary.addEventListener('click', clearSanctuary);
+
   // Room Toggle Action
   elBtnToggleRoom.addEventListener('click', toggleCurrentRoom);
 
@@ -792,14 +932,14 @@ function initEventListeners() {
   btnCancelModal.addEventListener('click', () => modalAddDevice.classList.add('hidden'));
   formAddDevice.addEventListener('submit', handleAddDevice);
 
-  // Reset Demo
-  elBtnResetDemo.addEventListener('click', () => {
-    if (confirm('Reset your home sanctuary to the default cozy setup?')) {
-      devices = JSON.parse(JSON.stringify(DEFAULT_DEVICES));
-      saveDevices();
-      renderApp();
-      showToast('Sanctuary restored to cozy factory preset! ☕', 'success');
-    }
+  // Quick Starter Preset Chips in Modal
+  document.querySelectorAll('.btn-chip[data-name]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.getElementById('dev-name').value = chip.dataset.name;
+      document.getElementById('dev-room').value = chip.dataset.room;
+      document.getElementById('dev-type').value = chip.dataset.type;
+      document.getElementById('dev-power').value = chip.dataset.power;
+    });
   });
 
   // Modal backdrop click
